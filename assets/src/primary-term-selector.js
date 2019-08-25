@@ -1,5 +1,5 @@
 /**
- * Verbatim copy of https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+ * Basically a verbatim copy of https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
  */
 /**
  * External dependencies
@@ -34,7 +34,7 @@ const DEFAULT_QUERY = {
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
-class HierarchicalTermSelector extends Component {
+class PrimaryTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.findTerm = this.findTerm.bind( this );
