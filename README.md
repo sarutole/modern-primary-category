@@ -42,9 +42,9 @@ To change the structure of your permalinks for regular posts, you will have to g
 `/wp-admin/options-permalink.php`.
 
 If you switch to *Custom structure*, you can have a permalink like this:
-/%category%/%custom_taxonomy%/%postname%/
+`/%category%/%custom_taxonomy%/%postname%/`
 
-![The structure of your permalinks should include %category% or (any other taxonomy name)](screenshot-2.png)
+![The structure of your permalinks should include `%category%` or (any other taxonomy name)](screenshot-2.png)
 
 To change the permalink for your CPTs, set the `slug` attribute as described in the snippet above.
 
@@ -53,7 +53,9 @@ To change the permalink for your CPTs, set the `slug` attribute as described in 
 When taxonomy term is used as a part of permalink, missing values might result in conflicts.
 To avoid that, when there is no term set for a post, but the permalink structure includes a %taxonomy% placeholder,
 a generic substitute will be used:
-`no-<taxonomy-name>`
+```
+no-<taxonomy-name>
+```
 
 Please note that for `category` taxonomy, the `default_category` option from the site settings will be used instead.
 
@@ -94,7 +96,7 @@ For that, you will need `node`, `npm` and `wp-scripts` installed on your machine
 To set up your development environment, please follow these instructions:
 [JavaScript Build Setup documentation](https://developer.wordpress.org/block-editor/tutorials/javascript/js-build-setup/)
 
-If you already have npm set up, all you will need will be to run these commands in ``/modern-primary-category/assets` dir:
+If you already have npm set up, all you will need will be to run these commands in `/modern-primary-category/assets` dir:
 ```
 npm install
 npm run build
