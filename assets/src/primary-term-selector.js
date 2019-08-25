@@ -1,5 +1,5 @@
 /**
- * Basically a verbatim copy of https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+ * Based on the original https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
  */
 /**
  * External dependencies
@@ -43,6 +43,7 @@ class PrimaryTermSelector extends Component {
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
 		this.onAddTerm = this.onAddTerm.bind( this );
 		this.onToggleForm = this.onToggleForm.bind( this );
+		this.onTogglePrimaryTerm = this.onTogglePrimaryTerm.bind( this );
 		this.setFilterValue = this.setFilterValue.bind( this );
 		this.sortBySelected = this.sortBySelected.bind( this );
 		this.state = {
@@ -59,12 +60,20 @@ class PrimaryTermSelector extends Component {
 	}
 
 	onChange( event ) {
-		const { onUpdateTerms, terms = [], taxonomy } = this.props;
+		const { onUpdateTerms, terms = [], taxonomy, slug, primaryTermIds } = this.props;
 		const termId = parseInt( event.target.value, 10 );
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm ?
 			without( terms, termId ) :
 			[ ...terms, termId ];
+
+		if ( hasTerm && primaryTermIds[ slug ] && termId === primaryTermIds[ slug ] ) {
+			/**
+			 * if primary term is no longer checked, clear the primary flag
+			 */
+			this.onTogglePrimaryTerm( null, primaryTermIds[ slug ] );
+		}
+
 		onUpdateTerms( newTerms, taxonomy.rest_base );
 	}
 
@@ -81,6 +90,29 @@ class PrimaryTermSelector extends Component {
 		this.setState( ( state ) => ( {
 			showForm: ! state.showForm,
 		} ) );
+	}
+
+	onTogglePrimaryTerm( event, selectedTermId ) {
+
+		if( event ) {
+			event.preventDefault();
+		}
+
+		const currTermId = this.props.primaryTermIds[ this.props.slug ] || 0;
+
+		const newValue = ( currTermId !== selectedTermId )
+			? selectedTermId
+			: 0;
+
+		/**
+		 * merge new value into existing array of primaryTerms
+		 */
+		const newMetaValue = JSON.stringify({
+			...this.props.primaryTermIds,
+			[ this.props.slug ]: newValue
+		});
+
+		this.props.setPostMeta( this.props.metafieldName, newMetaValue );
 	}
 
 	findTerm( terms, parent, name ) {
@@ -317,20 +349,37 @@ class PrimaryTermSelector extends Component {
 	}
 
 	renderTerms( renderedTerms ) {
-		const { terms = [] } = this.props;
-		return renderedTerms.map( ( term ) => {
+		const { terms = [], primaryTermIds, taxonomy } = this.props;
+		return renderedTerms.map( ( term, index ) => {
 			const id = `editor-post-taxonomies-hierarchical-term-${ term.id }`;
-			return (
-				<div key={ term.id } className="editor-post-taxonomies__hierarchical-terms-choice">
-					<input
-						id={ id }
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						type="checkbox"
-						checked={ terms.indexOf( term.id ) !== -1 }
-						value={ term.id }
-						onChange={ this.onChange }
+
+			const currPrimaryId = primaryTermIds[ taxonomy.slug ] || 0;
+			const isChecked = terms.indexOf( term.id ) !== -1;
+			const isPrimary = term.id === currPrimaryId || (currPrimaryId === 0 && index === 0);
+
+			const flag = isChecked
+				? <i
+						className={'dashicons dashicons-flag' + (isPrimary ? ' is-active' : '')}
+						title={ isPrimary ? __( 'Make not primary', 'stmpc' ) : __( 'Mark as primary', 'stmpc' ) }
+						onClick={ ( event ) => this.onTogglePrimaryTerm( event, term.id ) }
 					/>
-					<label htmlFor={ id }>{ unescapeString( term.name ) }</label>
+				: '';
+
+			const choiceClass = 'editor-post-taxonomies__hierarchical-terms-choice' + (isPrimary ? ' is-active' : '');
+
+			return (
+				<div key={ term.id } className={choiceClass}>
+					<label htmlFor={ id }>
+						<input
+							id={ id }
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							type="checkbox"
+							checked={ isChecked }
+							value={ term.id }
+							onChange={ this.onChange }
+						/>
+						{ unescapeString( term.name ) }{flag}
+					</label>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
 							{ this.renderTerms( term.children ) }
@@ -342,6 +391,7 @@ class PrimaryTermSelector extends Component {
 	}
 
 	render() {
+
 		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
 
 		if ( ! hasAssignAction ) {
@@ -436,13 +486,13 @@ class PrimaryTermSelector extends Component {
 						required
 					/>
 					{ !! availableTerms.length &&
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ this.onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
-						/>
+					<TreeSelect
+						label={ parentSelectLabel }
+						noOptionLabel={ noParentOption }
+						onChange={ this.onChangeFormParent }
+						selectedId={ formParent }
+						tree={ availableTermsTree }
+					/>
 					}
 					<Button
 						isDefault
@@ -454,15 +504,23 @@ class PrimaryTermSelector extends Component {
 				</form>
 			),
 		];
+
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { slug } ) => {
+	withSelect( ( select, { slug, metafieldName } ) => {
 		const { getCurrentPost } = select( 'core/editor' );
 		const { getTaxonomy } = select( 'core' );
 		const taxonomy = getTaxonomy( slug );
+
+		/**
+		 * will be undefined for new posts
+		 */
+		const $metas = select('core/editor').getEditedPostAttribute('meta') || {};
+
 		return {
+			primaryTermIds: $metas[metafieldName] ? JSON.parse( $metas[metafieldName] ) : {},
 			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
 			hasAssignAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-assign-' + taxonomy.rest_base ], false ) : false,
 			terms: taxonomy ? select( 'core/editor' ).getEditedPostAttribute( taxonomy.rest_base ) : [],
@@ -473,8 +531,15 @@ export default compose( [
 		onUpdateTerms( terms, restBase ) {
 			dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 		},
+		setPostMeta( fieldName, fieldValues ) {
+			dispatch( 'core/editor' ).editPost( {
+				meta: {
+					[ fieldName ]: fieldValues
+				}
+			});
+		}
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
-	withFilters( 'editor.PostTaxonomyType' ),
+	// withFilters( 'editor.PostTaxonomyType' ) intentionally commented out to avoid infinite loop
 ] )( PrimaryTermSelector );
