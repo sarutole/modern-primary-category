@@ -57,12 +57,12 @@ a generic substitute will be used:
 
 Please note that for `category` taxonomy, the `default_category` option from the site settings will be used instead.
 
-It might be worth mentioning, that when there are several terms from a single taxonomy assigned to a post,
-by default WordPress uses _the term with the lowest ID_ as primary.
+It might be worth mentioning, that when a post has several terms from a single taxonomy assigned to it,
+by default WordPress uses _the term with the lowest ID_ as *primary*.
 
 ### Extensibility options
 
-The plugin comes with several filters that can be used to hook custom logic.
+The plugin comes with several filters that can be used to hook in whatever custom logic is necessary.
 
 #### `stmpc/current_user_can`
 
@@ -90,7 +90,6 @@ Note, you will not need any additional setup besides placing the files of the pl
 
 However, if you decide to make modifications to the taxonomies metabox, you will have to rebuild the component which renders the metabox.
 For that, you will need `node`, `npm` and `wp-scripts` installed on your machine.
-```
 
 To set up your development environment, please follow these instructions:
 [JavaScript Build Setup documentation](https://developer.wordpress.org/block-editor/tutorials/javascript/js-build-setup/)
