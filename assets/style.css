@@ -1,0 +1,29 @@
+/*.editor-post-taxonomies__hierarchical-terms-choice:hover {*/
+  /*color: red;*/
+/*}*/
+
+.editor-post-taxonomies__hierarchical-terms-choice.is-active > label {
+/*  font-weight: bold;*/
+  text-decoration: underline;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice > label {
+  display: block;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice > label > .dashicons-flag {
+  text-decoration: none;
+  opacity: 0;
+  color: #2c7a27;
+  transition: opacity 300ms;
+  margin-left: 5px;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice.is-active > label > .dashicons-flag {
+  opacity: 1;
+  color: #b41316;
+}
+
+.editor-post-taxonomies__hierarchical-terms-choice > label:hover > .dashicons-flag {
+  opacity: 1;
+}

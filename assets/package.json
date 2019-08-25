@@ -1,0 +1,33 @@
+{
+  "name": "modern-primary-category",
+  "version": "0.0.1",
+  "description": "Gutenberg-friendly primary category plugin: choose a category to use in post's permalink. Works with CPTs and taxonomies.",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sarutole/modern-primary-category.git"
+  },
+  "keywords": [
+    "wordpress",
+    "gutenberg",
+    "block-editor",
+    "primary-category",
+    "plugin",
+    "wordpress-plugin",
+    "permalink"
+  ],
+  "author": "Saru Tole",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sarutole/modern-primary-category/issues"
+  },
+  "homepage": "https://github.com/sarutole/modern-primary-category#readme",
+  "devDependencies": {
+    "@wordpress/scripts": "^3.4.0"
+  },
+  "dependencies": {}
+}

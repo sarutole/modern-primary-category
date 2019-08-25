@@ -1,0 +1,18 @@
+{
+  "name": "sarutole/modern-primary-category",
+  "description": "Gutenberg-friendly primary category plugin. Can modify post permalinks. Supports CPTs and custom taxonomies.",
+  "type": "wordpress-plugin",
+  "homepage": "https://github.com/sarutole/modern-primary-category",
+  "support": {
+    "issues": "https://github.com/sarutole/modern-primary-category/issues"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Saru Tole",
+      "email": "sarutole@gmail.com",
+      "homepage": "https://github.com/sarutole"
+    }
+  ],
+  "keywords": ["WordPress", "wordpress-plugin", "primary-category", "permalinks", "primary-term", "main-term", "SEO", "Gutenberg", "Block-Editor", "React"]
+}
